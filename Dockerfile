@@ -1,6 +1,6 @@
 FROM python:3
 WORKDIR /
-
+ENV DEBIAN_FRONTEND=noninteractive
 COPY . ./
 
 RUN pip install --default-timeout=100 -r ./requirements.txt
