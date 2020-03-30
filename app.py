@@ -10,12 +10,6 @@ from flask import Flask, request, json, jsonify
 from flask import send_from_directory
 
 from constant.const import LOG_CONFIG_FILE_PATH, LOG_DIR, UPLOAD_DIR
-
-app = Flask(__name__)
-
-_VERSION = 1  # API version
-
-
 CONTEXT_PATH = '/optimize'
 UPLOAD_FOLDER = UPLOAD_DIR
 
