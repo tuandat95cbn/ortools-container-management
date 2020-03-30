@@ -6,5 +6,5 @@ COPY . ./
 RUN pip install --default-timeout=100 -r ./requirements.txt
 EXPOSE 8080
 RUN chmod 777 lauching.sh
-
+RUN mkdir logs
 CMD ./lauching.sh

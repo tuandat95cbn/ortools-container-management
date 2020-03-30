@@ -25,7 +25,7 @@ def create_app():
     def allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-    @app.route(CONTEXT_PATH + '/solve', methods=['POST'])
+    @app.route('/solve', methods=['POST'])
     def schedule():
         if request.method == 'POST':
             script = request.files['script']
@@ -57,7 +57,7 @@ def create_app():
             return response
 
 
-    @app.route(CONTEXT_PATH+'/files/<uuid:id>/<string:filename>',methods=['GET'])
+    @app.route('/files/<uuid:id>/<string:filename>',methods=['GET'])
     def get_file(id,filename):
         print(request.view_args['id'])
         file_path = os.path.join(app.config['UPLOAD_FOLDER'],str(id))
@@ -83,7 +83,7 @@ def create_app():
         return jsonify(status="ERROR", msg="Please try again later!!"), 405
 
 
-        return app
+    return app
 if __name__ == '__main__':
     logging.config.fileConfig(LOG_CONFIG_FILE_PATH)
     app = create_app()
