@@ -51,8 +51,8 @@ def create_app():
             client = docker.from_env()
             logging.info(HOST_DIR+folder_path)
             
-            #client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id)
-            client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id,volumes={HOST_DIR+folder_path : {'bind': '/root/script', 'mode': 'rw'}})
+            client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id)
+            #client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id,volumes={HOST_DIR+folder_path : {'bind': '/root/script', 'mode': 'rw'}})
             container = client.containers.get(id)
 
             logging.info(client.containers.list())
@@ -76,13 +76,14 @@ def create_app():
 
         logging.info('logs '+id)
         response_status = "SUCCESS"
-
-        res = {"status": response_status, "data": container.logs()}
+        logging.info(container.logs())
+        res = {"status": response_status, "data": container.logs().decode("utf-8") }
         response = app.response_class(
             response=json.dumps(res, sort_keys=False),
             status=200,
             mimetype='application/json'
         )
+        logging.info(response)
         return response
 
     @app.route('/files/<uuid:id>/<string:filename>',methods=['GET'])
