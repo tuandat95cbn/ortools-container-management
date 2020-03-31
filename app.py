@@ -10,6 +10,7 @@ from flask import Flask, request, json, jsonify
 from flask import send_from_directory
 
 from constant.const import LOG_CONFIG_FILE_PATH, LOG_DIR, UPLOAD_DIR
+import docker
 CONTEXT_PATH = '/optimize'
 UPLOAD_FOLDER = UPLOAD_DIR
 
@@ -45,7 +46,13 @@ def create_app():
             files = request.files.getlist('files[]')
             for file in files:
                 file.save(os.path.join(folder_path, file.filename))
+            client = docker.from_env()
 
+            client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id,volumes={folder_path : {'bind': '/root/script', 'mode': 'rw'}})
+            container = client.containers.get(id)
+
+            logging.info(client.containers.list())
+            logging.info(container.logs())
             response_status = "SUCCESS"
 
             res = {"status": response_status, "msg": "Job scheduled!", "id": id}
