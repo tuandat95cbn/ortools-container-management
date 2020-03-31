@@ -7,4 +7,5 @@ CONFIG_DIRECTORY_PATH = os.path.join(ROOT_PATH, 'config')
 LOG_CONFIG_FILE_PATH = os.path.join(CONFIG_DIRECTORY_PATH, 'log.conf')
 LOG_DIR = os.path.join(ROOT_PATH, 'logs')
 UPLOAD_DIR = os.path.join(ROOT_PATH, 'uploads')
+HOST_DIR='/home/ubuntu/data'
 

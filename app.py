@@ -9,7 +9,7 @@ import uuid
 from flask import Flask, request, json, jsonify
 from flask import send_from_directory
 
-from constant.const import LOG_CONFIG_FILE_PATH, LOG_DIR, UPLOAD_DIR
+from constant.const import LOG_CONFIG_FILE_PATH, LOG_DIR, UPLOAD_DIR, HOST_DIR
 import docker
 CONTEXT_PATH = '/optimize'
 UPLOAD_FOLDER = UPLOAD_DIR
@@ -17,6 +17,8 @@ UPLOAD_FOLDER = UPLOAD_DIR
 
 
 def create_app():
+
+    logging.config.fileConfig(LOG_CONFIG_FILE_PATH)
     ALLOWED_EXTENSIONS = set(['java', ])
     app = Flask(__name__, static_url_path=CONTEXT_PATH)
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -47,8 +49,10 @@ def create_app():
             for file in files:
                 file.save(os.path.join(folder_path, file.filename))
             client = docker.from_env()
-
-            client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id,volumes={folder_path : {'bind': '/root/script', 'mode': 'rw'}})
+            logging.info(HOST_DIR+folder_path)
+            
+            #client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id)
+            client.containers.run("tuandat95cbn/ortoolsbase:7.5un", detach=True, name=id,volumes={HOST_DIR+folder_path : {'bind': '/root/script', 'mode': 'rw'}})
             container = client.containers.get(id)
 
             logging.info(client.containers.list())
@@ -64,9 +68,25 @@ def create_app():
             return response
 
 
+    @app.route('/logs/<id>', methods=['GET'])
+    def logs(id):
+         
+        client = docker.from_env()
+        container = client.containers.get(id)
+
+        logging.info('logs '+id)
+        response_status = "SUCCESS"
+
+        res = {"status": response_status, "data": container.logs()}
+        response = app.response_class(
+            response=json.dumps(res, sort_keys=False),
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+
     @app.route('/files/<uuid:id>/<string:filename>',methods=['GET'])
     def get_file(id,filename):
-        print(request.view_args['id'])
         file_path = os.path.join(app.config['UPLOAD_FOLDER'],str(id))
         return send_from_directory(
                                    file_path,filename)
@@ -92,7 +112,6 @@ def create_app():
 
     return app
 if __name__ == '__main__':
-    logging.config.fileConfig(LOG_CONFIG_FILE_PATH)
     app = create_app()
     app.run(host="0.0.0.0", port=int(8080))
 
